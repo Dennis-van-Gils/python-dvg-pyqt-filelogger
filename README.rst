@@ -173,7 +173,7 @@ Methods
             Location of the log file in case it has to be created or opened
             for write access.
 
-            Default: ``""``
+            Default: ``"{yyMMdd_HHmmss}.txt"`` denoting the current date and time.
 
         mode (``str``, optional):
             Mode in which the log file is to be opened, see ``open()`` for
