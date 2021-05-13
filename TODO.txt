@@ -1,0 +1,2 @@
+* Add a new method `writelines()` to enable writing multiple lines at once.
+  See https://www.kite.com/python/docs/builtins.file.writelines
