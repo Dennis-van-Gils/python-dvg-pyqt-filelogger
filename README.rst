@@ -193,6 +193,19 @@ Methods
 
     Returns True if successful, False otherwise.
     
+* ``np_savetxt(*args, **kwargs) -> bool``
+    Write 1D or 2D array_like data to the currently opened log file. This
+    method passes all arguments directly to ``numpy.savetxt()``, see
+    https://numpy.org/doc/stable/reference/generated/numpy.savetxt.html.
+    This method outperforms ``FileLogger.write()``, especially when large
+    chunks of 2D data are passed (my test shows 8x faster).
+
+    By design any exceptions occurring in this method will not terminate the
+    execution, but it will report the error to the command line and continue
+    on instead.
+
+    Returns True if successful, False otherwise.
+    
 * ``flush()``
     Force-flush the contents in the OS buffer to file as soon as
     possible. Do not call repeatedly, because it causes overhead.

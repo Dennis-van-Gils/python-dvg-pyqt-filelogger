@@ -21,6 +21,7 @@ Installation::
         * ``stop_recording()``
         * ``update(filepath, mode)``
         * ``write(data)``
+        * ``np_savetxt(...)``
         * ``flush()``
         * ``close()``
         * ``is_recording()``
@@ -35,8 +36,8 @@ Installation::
 __author__ = "Dennis van Gils"
 __authoremail__ = "vangils.dennis@gmail.com"
 __url__ = "https://github.com/Dennis-van-Gils/python-dvg-pyqt-filelogger"
-__date__ = "11-08-2020"
-__version__ = "1.0.0"
+__date__ = "13-05-2021"
+__version__ = "1.1.0"
 
 from typing import AnyStr, Callable
 from pathlib import Path
@@ -44,6 +45,7 @@ import datetime
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QDateTime
+import numpy as np
 
 from dvg_debug_functions import print_fancy_traceback as pft
 
@@ -291,8 +293,9 @@ class FileLogger(QtCore.QObject):
             return True
 
     def write(self, data: AnyStr) -> bool:
-        """Write binary or ASCII data to the currently opened log file. By
-        design any exceptions occurring in this method will not terminate the
+        """Write binary or ASCII data to the currently opened log file.
+
+        By design any exceptions occurring in this method will not terminate the
         execution, but it will report the error to the command line and continue
         on instead.
 
@@ -300,6 +303,27 @@ class FileLogger(QtCore.QObject):
         """
         try:
             self._filehandle.write(data)
+        except Exception as err:  # pylint: disable=broad-except
+            pft(err, 3)
+            return False
+        else:
+            return True
+
+    def np_savetxt(self, *args, **kwargs) -> bool:
+        """Write 1D or 2D array_like data to the currently opened log file. This
+        method passes all arguments directly to ``numpy.savetxt()``, see
+        https://numpy.org/doc/stable/reference/generated/numpy.savetxt.html.
+        This method outperforms ``FileLogger.write()``, especially when large
+        chunks of 2D data are passed (my test shows 8x faster).
+
+        By design any exceptions occurring in this method will not terminate the
+        execution, but it will report the error to the command line and continue
+        on instead.
+
+        Returns True if successful, False otherwise.
+        """
+        try:
+            np.savetxt(self._filehandle, *args, **kwargs)
         except Exception as err:  # pylint: disable=broad-except
             pft(err, 3)
             return False
