@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""PyQt5 interface to handle logging data to file particularly well suited for
-multithreaded programs.
+"""PyQt/PySide interface to handle logging data to file particularly well suited
+for multithreaded programs.
+
+Supports PyQt5, PyQt6, PySide2 and PySide6.
 
 - Github: https://github.com/Dennis-van-Gils/python-dvg-pyqt-filelogger
 - PyPI: https://pypi.org/project/dvg-pyqt-filelogger
@@ -36,15 +38,72 @@ Installation::
 __author__ = "Dennis van Gils"
 __authoremail__ = "vangils.dennis@gmail.com"
 __url__ = "https://github.com/Dennis-van-Gils/python-dvg-pyqt-filelogger"
-__date__ = "13-05-2021"
-__version__ = "1.1.0"
+__date__ = "13-09-2022"
+__version__ = "1.2.0"
 
 from typing import AnyStr, Callable
 from pathlib import Path
 import datetime
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QDateTime
+# Mechanism to support both PyQt and PySide
+# -----------------------------------------
+import os
+import sys
+
+QT_LIB = os.getenv("PYQTGRAPH_QT_LIB")
+PYSIDE = "PySide"
+PYSIDE2 = "PySide2"
+PYSIDE6 = "PySide6"
+PYQT4 = "PyQt4"
+PYQT5 = "PyQt5"
+PYQT6 = "PyQt6"
+
+# pylint: disable=import-error, no-name-in-module
+# fmt: off
+if QT_LIB is None:
+    libOrder = [PYQT5, PYSIDE2, PYSIDE6, PYQT6]
+    for lib in libOrder:
+        if lib in sys.modules:
+            QT_LIB = lib
+            break
+
+if QT_LIB is None:
+    for lib in libOrder:
+        try:
+            __import__(lib)
+            QT_LIB = lib
+            break
+        except ImportError:
+            pass
+
+if QT_LIB is None:
+    raise Exception(
+        "DvG_PyQt_FileLogger requires PyQt5, PyQt6, PySide2 or PySide6; "
+        "none of these packages could be imported."
+    )
+
+if QT_LIB == PYQT5:
+    from PyQt5 import QtCore                               # type: ignore
+    from PyQt5.QtCore import pyqtSlot as Slot              # type: ignore
+    from PyQt5.QtCore import pyqtSignal as Signal          # type: ignore
+elif QT_LIB == PYQT6:
+    from PyQt6 import QtCore                               # type: ignore
+    from PyQt6.QtCore import pyqtSlot as Slot              # type: ignore
+    from PyQt6.QtCore import pyqtSignal as Signal          # type: ignore
+elif QT_LIB == PYSIDE2:
+    from PySide2 import QtCore                             # type: ignore
+    from PySide2.QtCore import Slot                        # type: ignore
+    from PySide2.QtCore import Signal                      # type: ignore
+elif QT_LIB == PYSIDE6:
+    from PySide6 import QtCore                             # type: ignore
+    from PySide6.QtCore import Slot                        # type: ignore
+    from PySide6.QtCore import Signal                      # type: ignore
+
+# fmt: on
+# pylint: enable=import-error, no-name-in-module
+# \end[Mechanism to support both PyQt and PySide]
+# -----------------------------------------------
+
 import numpy as np
 
 from dvg_debug_functions import print_fancy_traceback as pft
@@ -167,8 +226,8 @@ class FileLogger(QtCore.QObject):
         log.update()
     """
 
-    signal_recording_started = QtCore.pyqtSignal(str)
-    signal_recording_stopped = QtCore.pyqtSignal(Path)
+    signal_recording_started = Signal(str)
+    signal_recording_stopped = Signal(Path)
 
     def __init__(
         self,
@@ -199,26 +258,23 @@ class FileLogger(QtCore.QObject):
     def set_write_data_function(self, write_data_function: Callable):
         self._write_data_function = write_data_function
 
-    @QtCore.pyqtSlot(bool)
+    @Slot(bool)
     def record(self, state: bool = True):
-        """Can be called from any thread.
-        """
+        """Can be called from any thread."""
         if state:
             self.start_recording()
         else:
             self.stop_recording()
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def start_recording(self):
-        """Can be called from any thread.
-        """
+        """Can be called from any thread."""
         self._start = True
         self._stop = False
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def stop_recording(self):
-        """Can be called from any thread.
-        """
+        """Can be called from any thread."""
         self._start = False
         self._stop = True
 
@@ -249,7 +305,7 @@ class FileLogger(QtCore.QObject):
         if self._start:
             if filepath == "":
                 filepath = (
-                    QDateTime.currentDateTime().toString("yyMMdd_HHmmss")
+                    QtCore.QDateTime.currentDateTime().toString("yyMMdd_HHmmss")
                     + ".txt"
                 )
 
@@ -330,7 +386,7 @@ class FileLogger(QtCore.QObject):
         else:
             return True
 
-    @QtCore.pyqtSlot()
+    @Slot()
     def flush(self):
         """Force-flush the contents in the OS buffer to file as soon as
         possible. Do not call repeatedly, because it causes overhead.
@@ -348,11 +404,9 @@ class FileLogger(QtCore.QObject):
         return self._is_recording
 
     def elapsed(self) -> float:
-        """Returns time in seconds (``float``) since start of recording.
-        """
+        """Returns time in seconds (``float``) since start of recording."""
         return self._timer.elapsed() / 1e3
 
     def pretty_elapsed(self) -> str:
-        """Returns time as "h:mm:ss" (``str``) since start of recording.
-        """
+        """Returns time as "h:mm:ss" (``str``) since start of recording."""
         return str(datetime.timedelta(seconds=int(self.elapsed())))

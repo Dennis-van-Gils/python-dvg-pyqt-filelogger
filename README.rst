@@ -12,8 +12,10 @@
 
 DvG_PyQt_FileLogger
 ===================
-*PyQt5 interface to handle logging data to file particularly well suited for
-multithreaded programs.*
+*PyQt/PySide interface to handle logging data to file particularly well suited
+for multithreaded programs.*
+
+Supports PyQt5, PyQt6, PySide2 and PySide6.
 
 - Github: https://github.com/Dennis-van-Gils/python-dvg-pyqt-filelogger
 - PyPI: https://pypi.org/project/dvg-pyqt-filelogger
@@ -29,7 +31,7 @@ API
 
 ``class FileLogger(write_header_function: Callable = None, write_data_function: Callable = None)``
 --------------------------------------------------------------------------------------------------
-    
+
     Bases: ``PyQt5.QtCore.QObject``
 
     Handles logging data to a file particularly well suited for multithreaded
@@ -154,7 +156,7 @@ Methods
 
 * ``record(state: bool = True)``
     Can be called from any thread.
-    
+
 * ``start_recording()``
     Can be called from any thread.
 
@@ -192,7 +194,7 @@ Methods
     on instead.
 
     Returns True if successful, False otherwise.
-    
+
 * ``np_savetxt(*args, **kwargs) -> bool``
     Write 1D or 2D array_like data to the currently opened log file. This
     method passes all arguments directly to ``numpy.savetxt()``, see
@@ -205,7 +207,7 @@ Methods
     on instead.
 
     Returns True if successful, False otherwise.
-    
+
 * ``flush()``
     Force-flush the contents in the OS buffer to file as soon as
     possible. Do not call repeatedly, because it causes overhead.
