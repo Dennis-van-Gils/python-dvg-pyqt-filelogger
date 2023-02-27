@@ -2,9 +2,6 @@
     :target: https://pypi.org/project/dvg-pyqt-filelogger
 .. image:: https://img.shields.io/pypi/pyversions/dvg-pyqt-filelogger
     :target: https://pypi.org/project/dvg-pyqt-filelogger
-.. image:: https://requires.io/github/Dennis-van-Gils/python-dvg-pyqt-filelogger/requirements.svg?branch=master
-    :target: https://requires.io/github/Dennis-van-Gils/python-dvg-pyqt-filelogger/requirements/?branch=master
-    :alt: Requirements Status
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 .. image:: https://img.shields.io/badge/License-MIT-purple.svg
