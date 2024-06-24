@@ -9,8 +9,8 @@
 
 DvG_PyQt_FileLogger
 ===================
-*PyQt/PySide interface to handle logging data to file particularly well suited
-for multithreaded programs.*
+*Provides class `FileLogger()`: A PyQt/PySide interface to handle logging data
+to a file particularly well suited for multithreaded programs.*
 
 Supports PyQt5, PyQt6, PySide2 and PySide6.
 
@@ -24,53 +24,67 @@ Installation::
 Example usage
 -------------
 
-    .. code-block:: python
+The following are snippets of code, not a full program.
 
-        from PyQt5 import QtWidgets as QtWid
-        from dvg_pyqt_filelogger import FileLogger
+.. code-block:: python
 
-        #  When using a PyQt5 GUI put this inside your ``MainWindow()`` definition:
-        # ----
+    from qtpy import QtWidgets as QtWid
+    from dvg_pyqt_filelogger import FileLogger
 
-        self.qpbt_record = QtWid.QPushButton(
-            text="Click to start recording to file",
-            checkable=True
+    # Main/GUI thread
+    # ---------------
+
+    class MainWindow(QtWid.QWidget):
+        def __init__(
+            self,
+            log: FileLogger,
+            parent=None,
+            **kwargs
+        ):
+            super().__init__(parent, **kwargs)
+
+            # Create a record button
+            self.record_button = QtWid.QPushButton("Click to start recording to file")
+            self.record_button.setCheckable(True)
+            self.record_button.clicked.connect(lambda state: log.record(state))
+
+    class YourDataGeneratingDevice:
+        reading_1 = 0.0
+
+    device = YourDataGeneratingDevice()
+
+    def write_header_to_log():
+        log.write("elapsed [s]\treading_1\n")
+
+    def write_data_to_log():
+        log.write(f"{log.elapsed():.3f}\t{device.reading_1:.4f}\n")
+
+    log = FileLogger(
+        write_header_function=write_header_to_log,
+        write_data_function=write_data_to_log
+    )
+
+    log.signal_recording_started.connect(
+        lambda filepath: window.record_button.setText(
+            f"Recording to file: {filepath}"
         )
-        self.qpbt_record.clicked.connect(lambda state: log.record(state))
-
-        #  Initialize FileLogger at __main__
-        # ----
-
-        window = MainWindow()
-
-        log = FileLogger(
-            write_header_function=write_header_to_log,
-            write_data_function=write_data_to_log
+    )
+    log.signal_recording_stopped.connect(
+        lambda: window.record_button.setText(
+            "Click to start recording to file"
         )
-        log.signal_recording_started.connect(
-            lambda filepath: window.qpbt_record.setText(
-                "Recording to file: %s" % filepath
-            )
-        )
-        log.signal_recording_stopped.connect(
-            lambda: window.qpbt_record.setText(
-                "Click to start recording to file"
-            )
-        )
+    )
 
-        #  Define these functions in your main module:
-        # ----
+    window = MainWindow(log)
 
-        def write_header_to_log():
-            log.write("elapsed [s]\treading_1\n")
+    # Data acquisition and/or logging thread
+    # --------------------------------------
 
-        def write_data_to_log():
-            log.write("%.3f\t%.4f\n" % (log.elapsed(), state.reading_1))
+    # New data got acquired
+    device.reading_1 = 20.3
 
-        #  Lastly, put this inside your logging thread:
-        # ----
-
-        log.update()
+    # Must be called whenever new data has become available
+    log.update()
 
 API
 ===
@@ -84,6 +98,7 @@ Class FileLogger
     FileLogger(
         write_header_function: Callable | None = None,
         write_data_function: Callable | None = None,
+        encoding: str = "utf-8",
     )
 
 .. Note:: Inherits from: ``PyQt5.QtCore.QObject``
@@ -106,19 +121,19 @@ Class FileLogger
             Reference to a function that contains your specific code to write a
             header to the log file. This will get called during ``update()``.
 
+            The passed function can contain calls to this object's member
+            methods ``write()``, ``elapsed()`` and ``np_savetxt()``.
+
             Default: ``None``
 
         write_data_function (``Callable``, optional):
             Reference to a function that contains your specific code to write
             new data to the log file. This will get called during ``update()``.
 
+            The passed function can contain calls to this object's member
+            methods ``write()``, ``elapsed()`` and ``np_savetxt()``.
+
             Default: ``None``
-
-        Both of the above functions can contain calls to the following class
-        members:
-
-            * ``FileLogger.write()``
-            * ``FileLogger.elapsed()``
 
     NOTE:
         This class lacks a mutex and is hence not threadsafe from the get-go.
@@ -135,36 +150,59 @@ Class FileLogger
             updating text of a record button.
 
             Returns:
-                The filepath as ``str`` of the newly created log file.
+                The filepath (``str``) of the newly created log file.
 
             Type:
-                ``PyQt5.QtCore.pyqtSignal()``
+                ``PySide6.QtCore.Signal()``
 
         ``signal_recording_stopped (pathlib.Path)``:
             Emitted whenever the recording has stopped. Useful for, e.g., updating
             text of a record button.
 
             Returns:
-                The filepath as ``pathlib.Path()`` of the newly created log file.
+                The filepath as (``pathlib.Path()``) of the newly created log file.
                 You could use this to, e.g., automatically navigate to the log in
                 the file explorer or ask the user for a 'save to' destination.
 
             Type:
-                ``PyQt5.QtCore.pyqtSignal()``
+                ``PySide6.QtCore.Signal()``
 
     Methods:
         * ``set_write_header_function(write_header_function: Callable)``
+            Will change the parameter ``write_header_function`` as originally
+            passed during instantiation to this new callable.
+
+            Args:
+                write_header_function (``Callable``):
+                    Reference to a function that contains your specific code to
+                    write a header to the log file. This will get called during
+                    ``update()``.
+
+                    The passed function can contain calls to this object's member
+                    methods ``write()``, ``elapsed()`` and ``np_savetxt()``.
 
         * ``set_write_data_function(write_data_function: Callable)``
+            Will change the parameter ``write_data_function`` as originally
+            passed during instantiation to this new callable.
+
+            Args:
+                write_data_function (``Callable``):
+                    Reference to a function that contains your specific code to
+                    write new data to the log file. This will get called during
+                    ``update()``.
+
+                    The passed function can contain calls to this object's member
+                    methods ``write()``, ``elapsed()`` and ``np_savetxt()``.
 
         * ``record(state: bool = True)``
-            Can be called from any thread.
+            Start or stop recording as given by argument `state`. Can be called
+            from any thread.
 
         * ``start_recording()``
-            Can be called from any thread.
+            Start recording. Can be called from any thread.
 
         * ``stop_recording()``
-            Can be called from any thread.
+            Stop recording. Can be called from any thread.
 
         * ``update(filepath: str = "", mode: str = "a")``
             This method will have to get called repeatedly, presumably in the
@@ -191,8 +229,9 @@ Class FileLogger
                     Defaults: ``a``
 
         * ``write(data: AnyStr) -> bool``
-            Write binary or ASCII data to the currently opened log file. By
-            design any exceptions occurring in this method will not terminate the
+            Write binary or ASCII data to the currently opened log file.
+
+            By design any exceptions occurring in this method will not terminate the
             execution, but it will report the error to the command line and continue
             on instead.
 
@@ -216,11 +255,13 @@ Class FileLogger
             possible. Do not call repeatedly, because it causes overhead.
 
         * ``close()``
+            Close the log file.
 
         * ``is_recording() -> bool``
+            Is the log currently set to recording?
 
         * ``elapsed() -> float``
-            Returns time in seconds (``float``) since start of recording.
+            Return the time in seconds (``float``) since start of recording.
 
         * ``pretty_elapsed() -> str``
-            Returns time as "h:mm:ss" (``str``) since start of recording.
+            Return the time as "h:mm:ss" (``str``) since start of recording.
