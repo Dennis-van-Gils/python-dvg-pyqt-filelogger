@@ -75,6 +75,7 @@ __date__ = "24-06-2024"
 __version__ = "1.4.0"
 
 from typing import Union, Callable, IO
+from io import IOBase
 from pathlib import Path
 import datetime
 
@@ -173,7 +174,7 @@ class FileLogger(QtCore.QObject):
         self._is_recording = False
 
     def __del__(self):
-        if isinstance(self._filehandle, IO) and self._is_recording:
+        if isinstance(self._filehandle, IOBase) and self._is_recording:
             self._filehandle.close()
 
     def set_write_header_function(self, write_header_function: Callable):
@@ -315,7 +316,7 @@ class FileLogger(QtCore.QObject):
 
         Returns True if successful, False otherwise.
         """
-        if not isinstance(self._filehandle, IO):
+        if not isinstance(self._filehandle, IOBase):
             pft("Invalid file handle.")
             return False
 
@@ -340,7 +341,7 @@ class FileLogger(QtCore.QObject):
 
         Returns True if successful, False otherwise.
         """
-        if not isinstance(self._filehandle, IO):
+        if not isinstance(self._filehandle, IOBase):
             pft("Invalid file handle.")
             return False
 
@@ -357,12 +358,12 @@ class FileLogger(QtCore.QObject):
         """Force-flush the contents in the OS buffer to file as soon as
         possible. Do not call repeatedly, because it causes overhead.
         """
-        if isinstance(self._filehandle, IO):
+        if isinstance(self._filehandle, IOBase):
             self._filehandle.flush()
 
     def close(self):
         """Close the log file."""
-        if isinstance(self._filehandle, IO) and self._is_recording:
+        if isinstance(self._filehandle, IOBase) and self._is_recording:
             self._filehandle.close()
 
         self._start = False
