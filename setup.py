@@ -24,7 +24,7 @@ def read(*names, **kwargs):
 
 setup(
     name="dvg-pyqt-filelogger",
-    version="1.3.0",
+    version="1.4.0",
     license="MIT",
     description="PyQt/PySide interface to handle logging data to file particularly well suited for multithreaded programs.",
     long_description="%s\n%s"
@@ -51,11 +51,7 @@ setup(
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3",
         "Topic :: Utilities",
         "Topic :: Scientific/Engineering ",
         "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
@@ -74,8 +70,9 @@ setup(
     ],
     python_requires=">=3.6",
     install_requires=[
-        "numpy~=1.15",
-        "dvg-debug-functions~=2.1",
+        "numpy>=1.15,<3.0",
+        "dvg-debug-functions~=2.5",
+        "qtpy",
     ],
     extras_require={},
 )
