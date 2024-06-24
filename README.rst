@@ -101,7 +101,7 @@ Class FileLogger
         encoding: str = "utf-8",
     )
 
-.. Note:: Inherits from: ``PyQt5.QtCore.QObject``
+.. Note:: Inherits from: ``PySide6.QtCore.QObject``
 
     Handles logging data to a file particularly well suited for multithreaded
     programs where one thread is writing data to the log and the other thread
