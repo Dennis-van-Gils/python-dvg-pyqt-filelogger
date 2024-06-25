@@ -292,8 +292,8 @@ class FileLogger(QtCore.QObject):
         Returns True if successful, False otherwise.
         """
         if not isinstance(self._filepath, Path):
-            pft("Invalid file path.")
-            return False
+            pft("Invalid file path.")  # pragma: no cover
+            return False  # pragma: no cover
 
         try:
             self._filehandle = open(
@@ -317,8 +317,8 @@ class FileLogger(QtCore.QObject):
         Returns True if successful, False otherwise.
         """
         if not isinstance(self._filehandle, IOBase):
-            pft("Invalid file handle.")
-            return False
+            pft("Invalid file handle.")  # pragma: no cover
+            return False  # pragma: no cover
 
         try:
             self._filehandle.write(data)
@@ -342,8 +342,8 @@ class FileLogger(QtCore.QObject):
         Returns True if successful, False otherwise.
         """
         if not isinstance(self._filehandle, IOBase):
-            pft("Invalid file handle.")
-            return False
+            pft("Invalid file handle.")  # pragma: no cover
+            return False  # pragma: no cover
 
         try:
             np.savetxt(self._filehandle, *args, **kwargs)
