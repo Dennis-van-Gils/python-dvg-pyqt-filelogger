@@ -2,6 +2,10 @@
     :target: https://pypi.org/project/dvg-pyqt-filelogger
 .. image:: https://img.shields.io/pypi/pyversions/dvg-pyqt-filelogger
     :target: https://pypi.org/project/dvg-pyqt-filelogger
+.. image:: https://github.com/Dennis-van-Gils/python-dvg-pyqt-filelogger/actions/workflows/python-package.yml/badge.svg
+    :target: https://github.com/Dennis-van-Gils/python-dvg-pyqt-filelogger/actions/workflows/python-package.yml
+.. image:: https://coveralls.io/repos/github/Dennis-van-Gils/python-dvg-pyqt-filelogger/badge.svg
+    :target: https://coveralls.io/github/Dennis-van-Gils/python-dvg-pyqt-filelogger
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 .. image:: https://img.shields.io/badge/License-MIT-purple.svg
@@ -9,8 +13,8 @@
 
 DvG_PyQt_FileLogger
 ===================
-*Provides class `FileLogger()`: A PyQt/PySide interface to handle logging data
-to a file particularly well suited for multithreaded programs.*
+*Provides a PyQt interface to handle logging data to a file particularly well
+suited for multithreaded programs.*
 
 Supports PyQt5, PyQt6, PySide2 and PySide6.
 
