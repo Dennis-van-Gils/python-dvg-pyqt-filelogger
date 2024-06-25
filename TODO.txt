@@ -1,3 +1,1 @@
-* Extend pytests. Aim for 100 % code coverage. Add to Github workflow.
-
 * Add support for HDF5
