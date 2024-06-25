@@ -71,7 +71,7 @@ The following are snippets of code, not a full program.
 __author__ = "Dennis van Gils"
 __authoremail__ = "vangils.dennis@gmail.com"
 __url__ = "https://github.com/Dennis-van-Gils/python-dvg-pyqt-filelogger"
-__date__ = "24-06-2024"
+__date__ = "25-06-2024"
 __version__ = "1.4.0"
 
 from typing import Union, Callable, IO
@@ -369,6 +369,10 @@ class FileLogger(QtCore.QObject):
         self._start = False
         self._stop = False
         self._is_recording = False
+
+    def get_filepath(self) -> Union[Path, None]:
+        """Return the filepath (``pathlib.Path`` | ``None``) of the log."""
+        return self._filepath
 
     def is_recording(self) -> bool:
         """Is the log currently set to recording?"""

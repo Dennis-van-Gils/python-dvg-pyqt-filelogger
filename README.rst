@@ -257,6 +257,9 @@ Class FileLogger
         * ``close()``
             Close the log file.
 
+        * ``get_filepath() -> Path | None``
+            Return the filepath (``pathlib.Path`` | ``None``) of the log.
+
         * ``is_recording() -> bool``
             Is the log currently set to recording?
 

@@ -8,6 +8,7 @@ Changelog
 * Extended API and docstrings
 * Added argument `encoding`, defaulting to "utf-8"
 * Added type hints
+* Added method `get_filepath()`
 
 1.3.0 (2023-02-27)
 ------------------
