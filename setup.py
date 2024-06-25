@@ -26,7 +26,7 @@ setup(
     name="dvg-pyqt-filelogger",
     version="1.4.0",
     license="MIT",
-    description="PyQt/PySide interface to handle logging data to file particularly well suited for multithreaded programs.",
+    description="PyQt interface to handle logging data to file particularly well suited for multithreaded programs.",
     long_description="%s\n%s"
     % (
         re.compile("^.. start-badges.*^.. end-badges", re.M | re.S).sub(
